@@ -1,0 +1,59 @@
+@startuml
+actor Ticket
+participant TicketController
+participant TicketService
+participant TicketRepository
+
+Ticket -> TicketController: GET /ticket
+activate TicketController
+TicketController -> TicketService: getAllTicket(filters, page, size, sorting, sortDirection)
+activate TicketService
+TicketService -> TicketRepository: findByFilter(key, value, pageable)
+activate TicketRepository
+TicketRepository --> TicketService: Ticket data
+deactivate TicketRepository
+deactivate TicketService
+TicketController --> Ticket: HTTP Response
+deactivate TicketController
+
+participant SequenceGeneratorService
+
+Ticket -> TicketController: POST /ticket
+activate TicketController
+TicketController -> TicketService: saveTicket(newTicket)
+activate TicketService
+TicketService -> TicketRepository: saveAll(newTicket))
+activate TicketRepository
+TicketService -> SequenceGeneratorService: getSeqNumber(SEQUENCE_NAME)
+activate SequenceGeneratorService
+SequenceGeneratorService --> TicketService: uniqueID
+deactivate SequenceGeneratorService
+deactivate TicketRepository
+deactivate TicketService
+TicketController --> Ticket: HTTP Response
+deactivate TicketController
+
+Ticket -> TicketController: PUT /ticket
+activate TicketController
+TicketController -> TicketService: updateTicket(updates)
+activate TicketService
+TicketService -> TicketRepository: save(update)
+activate TicketRepository
+TicketRepository --> TicketService: Updated ticket data
+deactivate TicketRepository
+deactivate TicketService
+TicketController --> Ticket: HTTP Response
+deactivate TicketController
+
+Ticket -> TicketController: DELETE /ticket
+activate TicketController
+TicketController -> TicketService: deleteTicket(delIds)
+activate TicketService
+TicketService -> TicketRepository: deleteById(id)
+activate TicketRepository
+TicketRepository --> TicketService: Deletion status
+deactivate TicketRepository
+deactivate TicketService
+TicketController --> Ticket: HTTP Response
+deactivate TicketController
+@enduml
